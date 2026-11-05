@@ -649,7 +649,7 @@ fn header(app: &mut App, ui: &mut egui::Ui, chat: &Chat) -> Rect {
                     let more_glass = ui.painter().add(egui::Shape::Noop);
                     let more = theme::icon_button(
                         ui,
-                        Icon::Ellipsis,
+                        Icon::EllipsisVertical,
                         18.0,
                         palette.secondary,
                         palette.text,

@@ -918,6 +918,8 @@ fastframe_icons::icons! {
         Download => "download",
         Timer => "timer",
         Ellipsis => lucide "ellipsis",
+        EllipsisVertical => "ellipsis-vertical",
+        MessageSquarePlus => "message-square-plus",
         Eraser => "eraser",
         ExternalLink => lucide "external-link",
         Eye => lucide "eye",

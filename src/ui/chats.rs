@@ -227,7 +227,7 @@ fn header(app: &mut App, ui: &mut egui::Ui) {
                         header_title(
                             ui,
                             &crate::i18n::gettext(app.locale, tab_title(&app.page)),
-                            theme::bold(20.0),
+                            theme::bold(22.0),
                             palette.text,
                             buttons_width,
                         );
@@ -251,7 +251,7 @@ fn tab_title(page: &Page) -> &'static str {
     if *page == Page::Calls {
         "Calls"
     } else {
-        "Chats"
+        "WhatsApp"
     }
 }
 
@@ -341,11 +341,13 @@ fn search_and_filters(app: &mut App, ui: &mut egui::Ui) {
 enum HeaderButton {
     NewChat,
     NewCall,
-    HideList,
+    Menu,
 }
 
 /// The size of the header buttons' icons.
 const HEADER_ICON: f32 = 18.0;
+/// The green round button that starts a chat or a call.
+const NEW_BUTTON: f32 = 40.0;
 
 /// What the list header's first row needs beside the caption buttons
 /// ZapFast draws: the title and its buttons.
@@ -364,7 +366,7 @@ fn header_buttons(ctx: &egui::Context, calls: bool) -> Vec<HeaderButton> {
     }
     let mut buttons = vec![HeaderButton::NewChat];
     if !super::narrow(ctx) {
-        buttons.push(HeaderButton::HideList);
+        buttons.push(HeaderButton::Menu);
     }
     buttons
 }
@@ -386,12 +388,13 @@ fn header_button_row(app: &mut App, ui: &mut egui::Ui, buttons: &[HeaderButton],
     for button in buttons {
         match button {
             HeaderButton::NewChat => {
-                if theme::icon_button(
+                if theme::circle_button(
                     ui,
-                    Icon::SquarePen,
-                    HEADER_ICON,
-                    palette.secondary,
-                    palette.text,
+                    Icon::MessageSquarePlus,
+                    NEW_BUTTON,
+                    palette.accent,
+                    palette.accent_hover,
+                    palette.on_accent,
                     if macos { "New chat (⌘N)" } else { "New chat" },
                 )
                 .tab_stop(Stop::NewChat)
@@ -401,12 +404,13 @@ fn header_button_row(app: &mut App, ui: &mut egui::Ui, buttons: &[HeaderButton],
                 }
             }
             HeaderButton::NewCall => {
-                if theme::icon_button(
+                if theme::circle_button(
                     ui,
                     Icon::PhonePlus,
-                    HEADER_ICON,
-                    palette.secondary,
-                    palette.text,
+                    NEW_BUTTON,
+                    palette.accent,
+                    palette.accent_hover,
+                    palette.on_accent,
                     crate::i18n::gettext(app.locale, "New call").as_ref(),
                 )
                 .tab_stop(Stop::NewChat)
@@ -415,24 +419,35 @@ fn header_button_row(app: &mut App, ui: &mut egui::Ui, buttons: &[HeaderButton],
                     app.actions.push(Action::ShowNewCall(true));
                 }
             }
-            HeaderButton::HideList => {
-                if theme::icon_button(
+            HeaderButton::Menu => {
+                let menu = theme::icon_button(
                     ui,
-                    Icon::PanelLeft,
+                    Icon::EllipsisVertical,
                     HEADER_ICON,
                     palette.secondary,
                     palette.text,
-                    if macos {
-                        "Hide the chat list (⌘B)"
-                    } else {
-                        "Hide the chat list (Ctrl+B)"
-                    },
+                    &crate::i18n::gettext(app.locale, "More"),
                 )
-                .tab_stop(Stop::Sidebar)
-                .clicked()
-                {
-                    app.actions.push(Action::ToggleSidebar);
-                }
+                .tab_stop(Stop::Sidebar);
+                let hide = if macos {
+                    "Hide the chat list (⌘B)"
+                } else {
+                    "Hide the chat list (Ctrl+B)"
+                };
+                let settings = crate::i18n::gettext(app.locale, "Settings");
+                let width = widgets::menu_width(ui, &[hide, settings.as_ref()], true);
+                egui::Popup::menu(&menu)
+                    .width(width)
+                    .frame(widgets::menu_frame(&palette))
+                    .show(|ui| {
+                        if widgets::menu_item(ui, &palette, Some(Icon::PanelLeft), hide) {
+                            app.actions.push(Action::ToggleSidebar);
+                        }
+                        if widgets::menu_item(ui, &palette, Some(Icon::Settings), settings.as_ref())
+                        {
+                            app.actions.push(Action::Open(Page::Settings));
+                        }
+                    });
             }
         }
     }
@@ -440,11 +455,15 @@ fn header_button_row(app: &mut App, ui: &mut egui::Ui, buttons: &[HeaderButton],
 
 /// How wide `buttons` are drawn, with the spacing between them.
 fn header_buttons_width(ui: &egui::Ui, buttons: &[HeaderButton]) -> f32 {
+    let round = buttons
+        .iter()
+        .filter(|button| matches!(button, HeaderButton::NewChat | HeaderButton::NewCall))
+        .count();
     row_width(
         buttons.len(),
         HEADER_ICON + theme::ICON_BUTTON_PAD,
         ui.spacing().item_spacing.x,
-    )
+    ) + round as f32 * (NEW_BUTTON - HEADER_ICON - theme::ICON_BUTTON_PAD)
 }
 
 /// How wide `count` items `edge` points wide are with `spacing` between them.
