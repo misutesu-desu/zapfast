@@ -259,7 +259,7 @@ fn history(app: &mut App, ui: &mut egui::Ui) {
                     theme::text(
                         ui,
                         gettext(app.locale, "No matching calls"),
-                        theme::regular(13.0),
+                        theme::regular(14.5),
                         palette.secondary,
                     );
                 });
@@ -414,7 +414,7 @@ fn history_row(app: &mut App, ui: &mut egui::Ui, row: &[Message], actions: &mut 
         widgets::row_highlight(ui, &palette, rect, palette.surface_hover);
     }
     let avatar_rect =
-        Rect::from_center_size(pos2(rect.left() + 38.0, rect.center().y), Vec2::splat(48.0));
+        Rect::from_center_size(pos2(rect.left() + 47.0, rect.center().y), Vec2::splat(48.0));
     if link {
         crate::ui::call::paint_link_avatar(ui, &palette, avatar_rect);
     } else {
@@ -427,12 +427,12 @@ fn history_row(app: &mut App, ui: &mut egui::Ui, row: &[Message], actions: &mut 
             picture.as_deref(),
         );
     }
-    let left = rect.left() + 76.0;
+    let left = rect.left() + 86.0;
     let right = button_rect.left() - 6.0;
     let stamp_galley = ui
         .painter()
-        .layout_no_wrap(stamp, theme::regular(11.5), palette.dim);
-    let name_top = rect.top() + 14.0;
+        .layout_no_wrap(stamp, theme::regular(12.0), palette.dim);
+    let name_top = rect.top() + 15.0;
     ui.painter().galley(
         pos2(right - stamp_galley.size().x, name_top + 2.0),
         stamp_galley.clone(),
@@ -468,12 +468,12 @@ fn history_row(app: &mut App, ui: &mut egui::Ui, row: &[Message], actions: &mut 
     let detail = widgets::line(
         ui,
         &summary,
-        theme::regular(13.0),
+        theme::regular(14.5),
         palette.secondary,
         (right - left - 21.0).max(0.0),
         1,
     );
-    detail.paint(ui, pos2(left + 21.0, rect.top() + 38.0), palette.secondary);
+    detail.paint(ui, pos2(left + 21.0, rect.top() + 40.0), palette.secondary);
 }
 
 /// What a call was and how it went, on one line: "Video call · 12 min 34 s", with how many
@@ -564,7 +564,7 @@ fn new_call_list(app: &mut App, ui: &mut egui::Ui) {
                     theme::text(
                         ui,
                         gettext(app.locale, "No matching contacts"),
-                        theme::regular(13.0),
+                        theme::regular(14.5),
                         palette.secondary,
                     );
                 });
@@ -594,7 +594,7 @@ fn section(ui: &mut egui::Ui, palette: &theme::Palette, label: &str) {
             bottom: 6,
         })
         .show(ui, |ui| {
-            theme::text(ui, label, theme::medium(13.0), palette.accent);
+            theme::text(ui, label, theme::medium(14.5), palette.accent);
         });
 }
 
@@ -617,15 +617,15 @@ fn person(app: &mut App, ui: &mut egui::Ui, id: &str, actions: &mut Vec<Action>)
             widgets::row_highlight(ui, &palette, rect, palette.surface_hover);
         }
         let avatar_rect =
-            Rect::from_center_size(pos2(rect.left() + 38.0, rect.center().y), Vec2::splat(48.0));
+            Rect::from_center_size(pos2(rect.left() + 47.0, rect.center().y), Vec2::splat(48.0));
         widgets::paint_avatar(ui, &palette, avatar_rect, &name, id, picture.as_deref());
-        let left = rect.left() + 76.0;
+        let left = rect.left() + 86.0;
         let width = (buttons.left() - 8.0 - left).max(0.0);
-        let name_line = widgets::line(ui, &name, theme::medium(14.5), palette.text, width, 1);
-        name_line.paint(ui, pos2(left, rect.top() + 14.0), palette.text);
+        let name_line = widgets::line(ui, &name, theme::regular(16.0), palette.text, width, 1);
+        name_line.paint(ui, pos2(left, rect.top() + 15.0), palette.text);
         if let Some(phone) = crate::model::phone_of(id).map(crate::util::phone) {
-            let phone_line = widgets::line(ui, &phone, theme::regular(13.0), palette.dim, width, 1);
-            phone_line.paint(ui, pos2(left, rect.top() + 38.0), palette.dim);
+            let phone_line = widgets::line(ui, &phone, theme::regular(14.5), palette.dim, width, 1);
+            phone_line.paint(ui, pos2(left, rect.top() + 40.0), palette.dim);
         }
     }
     let mut child = ui.new_child(

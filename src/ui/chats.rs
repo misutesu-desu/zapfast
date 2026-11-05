@@ -777,7 +777,7 @@ fn starred_row(
     let body = widgets::line(
         ui,
         &words,
-        theme::regular(13.0),
+        theme::regular(14.5),
         palette.text,
         body_width,
         12,
@@ -815,22 +815,22 @@ fn starred_row(
         ui,
         pos2(
             rect.left() + 16.0,
-            rect.top() + 14.0 - name_line.size().y / 2.0,
+            rect.top() + 15.0 - name_line.size().y / 2.0,
         ),
         palette.text,
     );
     ui.painter().text(
-        pos2(rect.right() - 16.0, rect.top() + 14.0),
+        pos2(rect.right() - 36.0, rect.top() + 15.0),
         egui::Align2::RIGHT_CENTER,
         when,
-        theme::regular(11.5),
+        theme::regular(12.0),
         palette.secondary,
     );
     // The message itself, as the bubble the chat shows: same fill, same side,
     // with the time in its bottom corner.
     let bubble_width = (body.size().x + 20.0 + clock.size().x + 6.0).min(width - 32.0);
     let left = if message.from_me {
-        rect.right() - 16.0 - bubble_width
+        rect.right() - 36.0 - bubble_width
     } else {
         rect.left() + 16.0
     };
@@ -1109,19 +1109,19 @@ fn locked_entry(app: &mut App, ui: &mut egui::Ui) {
             widgets::row_highlight(ui, &palette, rect, palette.surface_hover);
         }
         let icon_rect =
-            Rect::from_center_size(pos2(rect.left() + 38.0, rect.center().y), Vec2::splat(22.0));
+            Rect::from_center_size(pos2(rect.left() + 47.0, rect.center().y), Vec2::splat(22.0));
         Icon::LockOpen
             .image(palette.accent, 22.0)
             .paint_at(ui, icon_rect);
         ui.painter().text(
-            pos2(rect.left() + 76.0, rect.center().y),
+            pos2(rect.left() + 86.0, rect.center().y),
             egui::Align2::LEFT_CENTER,
             crate::i18n::gettext(app.locale, "Locked chats"),
-            theme::medium(14.5),
+            theme::regular(16.0),
             palette.text,
         );
         ui.painter().text(
-            pos2(rect.right() - 16.0, rect.center().y),
+            pos2(rect.right() - 36.0, rect.center().y),
             egui::Align2::RIGHT_CENTER,
             count.to_string(),
             theme::regular(12.5),
@@ -1330,7 +1330,7 @@ fn hit_row(app: &mut App, ui: &mut egui::Ui, hit: &Message) {
             widgets::row_highlight(ui, &palette, rect, palette.surface_hover);
         }
         let avatar_rect =
-            Rect::from_center_size(pos2(rect.left() + 38.0, rect.center().y), Vec2::splat(48.0));
+            Rect::from_center_size(pos2(rect.left() + 47.0, rect.center().y), Vec2::splat(48.0));
         let picture = app.avatar(&hit.chat);
         widgets::paint_avatar(
             ui,
@@ -1340,30 +1340,37 @@ fn hit_row(app: &mut App, ui: &mut egui::Ui, hit: &Message) {
             &hit.chat,
             picture.as_deref(),
         );
-        let left = rect.left() + 76.0;
-        let right = rect.right() - 14.0;
+        let left = rect.left() + 86.0;
+        let right = rect.right() - 36.0;
         let stamp_galley = ui.painter().layout_no_wrap(
             crate::util::chat_stamp(app.locale, hit.timestamp),
-            theme::regular(11.5),
+            theme::regular(12.0),
             palette.dim,
         );
-        let name_top = rect.top() + 14.0;
+        let name_top = rect.top() + 15.0;
         ui.painter().galley(
             pos2(right - stamp_galley.size().x, name_top + 1.0),
             stamp_galley.clone(),
             palette.dim,
         );
         let name_width = (right - stamp_galley.size().x - 8.0 - left).max(0.0);
-        let name = widgets::line(ui, &title, theme::medium(14.5), palette.text, name_width, 1);
+        let name = widgets::line(
+            ui,
+            &title,
+            theme::regular(16.0),
+            palette.text,
+            name_width,
+            1,
+        );
         name.paint(ui, pos2(left, name_top), palette.text);
         // Show the sender for group messages.
-        let line_y = rect.top() + 38.0;
+        let line_y = rect.top() + 40.0;
         let mut x = left;
         if hit.from_me {
             let who = widgets::line(
                 ui,
                 "You: ",
-                theme::regular(13.0),
+                theme::regular(14.5),
                 palette.dim,
                 (right - x) * 0.5,
                 1,
@@ -1376,7 +1383,7 @@ fn hit_row(app: &mut App, ui: &mut egui::Ui, hit: &Message) {
             let who = widgets::line(
                 ui,
                 &format!("{first}: "),
-                theme::regular(13.0),
+                theme::regular(14.5),
                 palette.dim,
                 (right - x) * 0.5,
                 1,
@@ -1387,7 +1394,7 @@ fn hit_row(app: &mut App, ui: &mut egui::Ui, hit: &Message) {
         let words = widgets::line(
             ui,
             &app.preview_line(&hit.summary_in(app.locale), hit),
-            theme::regular(13.0),
+            theme::regular(14.5),
             palette.dim,
             (right - x).max(0.0),
             1,
@@ -1444,17 +1451,17 @@ pub(super) fn action_row(app: &App, ui: &mut egui::Ui, icon: Icon, label: &str) 
             widgets::row_highlight(ui, &palette, rect, palette.surface_hover);
         }
         let circle =
-            Rect::from_center_size(pos2(rect.left() + 38.0, rect.center().y), Vec2::splat(48.0));
+            Rect::from_center_size(pos2(rect.left() + 47.0, rect.center().y), Vec2::splat(48.0));
         ui.painter()
             .circle_filled(circle.center(), circle.width() / 2.0, palette.accent);
         theme::paint_icon(ui, icon, circle, 22.0, palette.on_accent);
-        let left = rect.left() + 76.0;
+        let left = rect.left() + 86.0;
         let line = widgets::line(
             ui,
             label,
-            theme::medium(14.5),
+            theme::regular(16.0),
             palette.text,
-            rect.right() - 14.0 - left,
+            rect.right() - 36.0 - left,
             1,
         );
         line.paint(
@@ -1484,29 +1491,29 @@ fn person_row(
             widgets::row_highlight(ui, &palette, rect, palette.surface_hover);
         }
         let avatar_rect =
-            Rect::from_center_size(pos2(rect.left() + 38.0, rect.center().y), Vec2::splat(48.0));
+            Rect::from_center_size(pos2(rect.left() + 47.0, rect.center().y), Vec2::splat(48.0));
         let picture = app.avatar(id);
         widgets::paint_avatar(ui, &palette, avatar_rect, name, id, picture.as_deref());
-        let left = rect.left() + 76.0;
+        let left = rect.left() + 86.0;
         let name_line = widgets::line(
             ui,
             name,
-            theme::medium(14.5),
+            theme::regular(16.0),
             palette.text,
-            rect.right() - 14.0 - left,
+            rect.right() - 36.0 - left,
             1,
         );
-        name_line.paint(ui, pos2(left, rect.top() + 14.0), palette.text);
+        name_line.paint(ui, pos2(left, rect.top() + 15.0), palette.text);
         if let Some(detail) = detail {
             let phone_line = widgets::line(
                 ui,
                 detail,
-                theme::regular(13.0),
+                theme::regular(14.5),
                 palette.dim,
-                rect.right() - 14.0 - left,
+                rect.right() - 36.0 - left,
                 1,
             );
-            phone_line.paint(ui, pos2(left, rect.top() + 38.0), palette.dim);
+            phone_line.paint(ui, pos2(left, rect.top() + 40.0), palette.dim);
         }
     }
     response.on_hover_cursor(egui::CursorIcon::PointingHand)
@@ -1547,7 +1554,7 @@ fn row(app: &mut App, ui: &mut egui::Ui, chat: &Chat) -> egui::Response {
             widgets::row_highlight(ui, &palette, rect, palette.surface_hover);
         }
         let avatar_rect =
-            Rect::from_center_size(pos2(rect.left() + 38.0, rect.center().y), Vec2::splat(48.0));
+            Rect::from_center_size(pos2(rect.left() + 47.0, rect.center().y), Vec2::splat(48.0));
         let picture = app.avatar(&chat.id);
         widgets::paint_avatar(
             ui,
@@ -1561,8 +1568,8 @@ fn row(app: &mut App, ui: &mut egui::Ui, chat: &Chat) -> egui::Response {
             widgets::paint_disappearing_badge(ui, &palette, avatar_rect);
         }
 
-        let left = rect.left() + 76.0;
-        let right = rect.right() - 14.0;
+        let left = rect.left() + 86.0;
+        let right = rect.right() - 36.0;
         let stamp = if chat.last_activity > 0 {
             crate::util::chat_stamp(app.locale, chat.last_activity)
         } else {
@@ -1576,8 +1583,8 @@ fn row(app: &mut App, ui: &mut egui::Ui, chat: &Chat) -> egui::Response {
         };
         let stamp_galley = ui
             .painter()
-            .layout_no_wrap(stamp, theme::regular(11.5), stamp_color);
-        let name_top = rect.top() + 14.0;
+            .layout_no_wrap(stamp, theme::regular(12.0), stamp_color);
+        let name_top = rect.top() + 15.0;
         ui.painter().galley(
             pos2(right - stamp_galley.size().x, name_top + 1.0),
             stamp_galley.clone(),
@@ -1585,21 +1592,21 @@ fn row(app: &mut App, ui: &mut egui::Ui, chat: &Chat) -> egui::Response {
         );
         let name_width = (right - stamp_galley.size().x - 8.0 - left).max(0.0);
         let name_font = if unread {
-            theme::medium(15.0)
+            theme::medium(16.0)
         } else {
-            theme::regular(15.0)
+            theme::regular(16.0)
         };
         let name = widgets::line(ui, &title, name_font, palette.text, name_width, 1);
         name.paint(ui, pos2(left, name_top), palette.text);
 
         // Leave room for badges beside the latest-message preview.
         let mut badge_right = right;
-        let line_y = rect.top() + 38.0;
+        let line_y = rect.top() + 40.0;
         if unread {
             let width = widgets::unread_indicator(
                 ui,
                 &palette,
-                pos2(badge_right - 10.0, line_y + 8.0),
+                pos2(badge_right - 10.0, line_y + 10.0),
                 chat.unread,
                 chat.marked_unread,
                 muted,
@@ -1609,12 +1616,12 @@ fn row(app: &mut App, ui: &mut egui::Ui, chat: &Chat) -> egui::Response {
         if chat.unread > 0 && chat.unread_mention.is_some() {
             // A mention calls even in a muted chat, as on WhatsApp.
             let width =
-                widgets::mention_badge(ui, &palette, pos2(badge_right - 10.0, line_y + 8.0));
+                widgets::mention_badge(ui, &palette, pos2(badge_right - 10.0, line_y + 10.0));
             badge_right -= width + 6.0;
         }
         if muted {
             let icon_rect =
-                Rect::from_center_size(pos2(badge_right - 8.0, line_y + 8.0), Vec2::splat(15.0));
+                Rect::from_center_size(pos2(badge_right - 8.0, line_y + 10.0), Vec2::splat(15.0));
             Icon::VolumeX
                 .image(palette.dim, 15.0)
                 .paint_at(ui, icon_rect);
@@ -1622,7 +1629,7 @@ fn row(app: &mut App, ui: &mut egui::Ui, chat: &Chat) -> egui::Response {
         }
         if chat.pinned {
             let icon_rect =
-                Rect::from_center_size(pos2(badge_right - 8.0, line_y + 8.0), Vec2::splat(14.0));
+                Rect::from_center_size(pos2(badge_right - 8.0, line_y + 10.0), Vec2::splat(14.0));
             Icon::Pin.image(palette.dim, 14.0).paint_at(ui, icon_rect);
             badge_right -= 20.0;
         }
@@ -1648,7 +1655,7 @@ fn row(app: &mut App, ui: &mut egui::Ui, chat: &Chat) -> egui::Response {
             widgets::line(
                 ui,
                 &who,
-                theme::medium(13.0),
+                theme::medium(14.5),
                 palette.accent,
                 badge_right - x,
                 1,
@@ -1659,7 +1666,7 @@ fn row(app: &mut App, ui: &mut egui::Ui, chat: &Chat) -> egui::Response {
             let label = widgets::line(
                 ui,
                 &label,
-                theme::medium(13.0),
+                theme::medium(14.5),
                 palette.accent,
                 (badge_right - x) * 0.5,
                 1,
@@ -1670,7 +1677,7 @@ fn row(app: &mut App, ui: &mut egui::Ui, chat: &Chat) -> egui::Response {
             widgets::line(
                 ui,
                 &draft,
-                theme::regular(13.0),
+                theme::regular(14.5),
                 preview_color,
                 (badge_right - x).max(0.0),
                 1,
@@ -1679,7 +1686,7 @@ fn row(app: &mut App, ui: &mut egui::Ui, chat: &Chat) -> egui::Response {
             let mut prefix = String::new();
             if last.from_me {
                 let tick_rect =
-                    Rect::from_center_size(pos2(x + 8.0, line_y + 8.0), Vec2::splat(16.0));
+                    Rect::from_center_size(pos2(x + 8.0, line_y + 10.0), Vec2::splat(16.0));
                 widgets::ticks(
                     ui,
                     &palette,
@@ -1699,7 +1706,7 @@ fn row(app: &mut App, ui: &mut egui::Ui, chat: &Chat) -> egui::Response {
                 let sender = widgets::line(
                     ui,
                     &prefix,
-                    theme::regular(13.0),
+                    theme::regular(14.5),
                     preview_color,
                     (badge_right - x) * 0.5,
                     1,
@@ -1714,7 +1721,7 @@ fn row(app: &mut App, ui: &mut egui::Ui, chat: &Chat) -> egui::Response {
                     &app.resolve_mention_tokens(&last.summary_in(app.locale)),
                     &[],
                 ),
-                theme::regular(13.0),
+                theme::regular(14.5),
                 preview_color,
                 (badge_right - x).max(0.0),
                 1,
@@ -1730,7 +1737,7 @@ fn row(app: &mut App, ui: &mut egui::Ui, chat: &Chat) -> egui::Response {
             }
             words
         } else {
-            widgets::line(ui, "", theme::regular(13.0), preview_color, 1.0, 1)
+            widgets::line(ui, "", theme::regular(14.5), preview_color, 1.0, 1)
         };
         preview.paint(ui, pos2(x, line_y), preview_color);
     }
@@ -1836,7 +1843,7 @@ fn full_preview_tooltip(
             let line = widgets::line(
                 ui,
                 text.trim_end(),
-                theme::regular(13.0),
+                theme::regular(14.5),
                 color,
                 FULL_PREVIEW_WIDTH,
                 FULL_PREVIEW_ROWS,

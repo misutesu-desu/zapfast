@@ -631,7 +631,7 @@ fn hsl(hue: f32, saturation: f32, lightness: f32) -> Color32 {
 pub const RADIUS: u8 = 8;
 pub const RADIUS_SMALL: u8 = 4;
 pub const FOCUS_STROKE_WIDTH: f32 = 1.0;
-pub const ROW_HEIGHT: f32 = 68.0;
+pub const ROW_HEIGHT: f32 = 76.0;
 pub const TOP_BAR_HEIGHT: f32 = 60.0;
 
 pub fn regular(size: f32) -> egui::FontId {

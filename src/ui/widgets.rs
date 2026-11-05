@@ -1238,7 +1238,11 @@ pub fn paint_vertical_gradient(ui: &Ui, rect: Rect, top: Color32, bottom: Color3
 /// The hover or selection behind a chat-list row: a rounded card inset from
 /// the list's edges rather than a full-width band.
 pub fn row_highlight(ui: &Ui, palette: &Palette, rect: Rect, color: Color32) {
-    highlight_card(ui, palette, rect.shrink2(vec2(8.0, 2.0)), color);
+    let card = Rect::from_min_max(
+        rect.min + vec2(ROW_INSET_LEFT, 2.0),
+        rect.max - vec2(ROW_INSET_RIGHT, 2.0),
+    );
+    highlight_card(ui, palette, card, color);
 }
 
 /// The card `row_highlight` paints, over `card` itself: the rail's lit and
@@ -1425,6 +1429,10 @@ pub enum Side {
     Left,
     Right,
 }
+
+const ROW_INSET_LEFT: f32 = 10.0;
+/// Wider than the left, so the list's scroll bar clears the card.
+const ROW_INSET_RIGHT: f32 = 20.0;
 
 /// Corner radius of a message bubble.
 pub const BUBBLE_RADIUS: u8 = 8;
@@ -2017,7 +2025,7 @@ pub fn dotted_chip(
                 .circle_filled(pos2(rect.left() + 13.0, rect.center().y), 4.0, dot);
         }
         let mut pos = pos2(
-            rect.left() + 9.0 + dot_width,
+            rect.left() + 13.0 + dot_width,
             rect.center().y - text.size().y / 2.0,
         );
         let advance = text.size().x + gap;
