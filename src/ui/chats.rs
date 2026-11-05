@@ -344,6 +344,9 @@ enum HeaderButton {
     Menu,
 }
 
+/// Height of the Archived row at the head of the list.
+const ARCHIVED_ROW: f32 = 52.0;
+
 /// The size of the header buttons' icons.
 const HEADER_ICON: f32 = 18.0;
 /// The green round button that starts a chat or a call.
@@ -948,6 +951,13 @@ fn list(app: &mut App, ui: &mut egui::Ui) {
         results(app, ui);
         return;
     }
+    if app.chat_filter == ChatFilter::All
+        && app.label_filter.is_none()
+        && !app.show_archived
+        && app.archived_count() > 0
+    {
+        archived_entry(app, ui);
+    }
     let chats: Vec<Chat> = app.visible_chats().into_iter().cloned().collect();
     if chats.is_empty() {
         // The favorites title is translated, so it is bound here: the tuple
@@ -1097,6 +1107,52 @@ pub(crate) fn list_offset_id() -> egui::Id {
 }
 
 /// The row the secret code reveals: the only thing the search then shows.
+/// The row at the head of the list that opens the archived chats.
+fn archived_entry(app: &mut App, ui: &mut egui::Ui) {
+    let palette = app.palette;
+    let (rect, response) =
+        ui.allocate_exact_size(vec2(ui.available_width(), ARCHIVED_ROW), Sense::click());
+    let label = crate::i18n::gettext(app.locale, "Archived");
+    response.widget_info(|| {
+        egui::WidgetInfo::labeled(egui::WidgetType::Button, ui.is_enabled(), label.as_ref())
+    });
+    theme::focus_outline(ui, response.id, rect, f32::from(theme::RADIUS));
+    if ui.is_rect_visible(rect) {
+        if response.hovered() || response.has_focus() {
+            widgets::row_highlight(ui, &palette, rect, palette.surface_hover);
+        }
+        let icon_rect =
+            Rect::from_center_size(pos2(rect.left() + 47.0, rect.center().y), Vec2::splat(22.0));
+        Icon::Archive
+            .image(palette.secondary, 22.0)
+            .paint_at(ui, icon_rect);
+        ui.painter().text(
+            pos2(rect.left() + 86.0, rect.center().y),
+            egui::Align2::LEFT_CENTER,
+            label.as_ref(),
+            theme::regular(16.0),
+            palette.text,
+        );
+        let unread = app.archived_unread();
+        if unread > 0 {
+            ui.painter().text(
+                pos2(rect.right() - 36.0, rect.center().y),
+                egui::Align2::RIGHT_CENTER,
+                unread.to_string(),
+                theme::regular(12.5),
+                palette.accent,
+            );
+        }
+    }
+    let response = response
+        .on_hover_cursor(egui::CursorIcon::PointingHand)
+        .tab_stop(Stop::Archived);
+    if response.clicked() {
+        let actions = super::rail::Destination::Archived.actions(app);
+        app.actions.extend(actions);
+    }
+}
+
 fn locked_entry(app: &mut App, ui: &mut egui::Ui) {
     let palette = app.palette;
     let count = app.locked_count();

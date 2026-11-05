@@ -19,7 +19,7 @@ use super::widgets;
 pub const WIDTH: f32 = 64.0;
 /// Height of one destination at the top: the list header's title and
 /// search field sit level with Chats and Calls.
-const CELL: f32 = 48.0;
+const CELL: f32 = 44.0;
 /// The lit square behind a destination's icon.
 const PLATE: f32 = 40.0;
 /// A destination's icon.
@@ -183,6 +183,8 @@ pub fn show(app: &mut App, ui: &mut egui::Ui, hidden: bool) {
         } else {
             ui.add_space(GAP);
         }
+        // Archived is a row at the head of the chat list instead, except with
+        // the list hidden, where the rail is the only way to it.
         let bottom: Vec<Destination> = [
             Destination::Starred,
             Destination::Archived,
@@ -191,6 +193,7 @@ pub fn show(app: &mut App, ui: &mut egui::Ui, hidden: bool) {
         ]
         .into_iter()
         .filter(|destination| destination.offered(app))
+        .filter(|destination| hidden || *destination != Destination::Archived)
         .collect();
         let foot = bottom.len() as f32 * (PLATE + GAP) + GAP + AVATAR + GAP;
         let minimum = 2.0 * CELL
@@ -248,11 +251,7 @@ pub fn show(app: &mut App, ui: &mut egui::Ui, hidden: bool) {
     });
     let rect = response.response.rect;
     ui.ctx().data_mut(|data| data.insert_temp(rect_id(), rect));
-    // No line between the rail and the list, whose shades tell them apart;
-    // beside the conversation the rail ends as the list does.
-    if hidden {
-        widgets::paint_edge_beside(ui, &palette, rect);
-    }
+    widgets::paint_edge_beside(ui, &palette, rect);
 }
 
 /// The button that brings the hidden chat list back.
@@ -360,10 +359,20 @@ fn destination_button(
     });
     if ui.is_rect_visible(plate) {
         let hovered = response.hovered() || response.has_focus();
-        if lit {
-            widgets::highlight_card(ui, palette, plate, palette.surface_active);
+        let plate_fill = if lit {
+            Some(palette.surface_active)
         } else if hovered {
-            widgets::highlight_card(ui, palette, plate, palette.surface_hover);
+            Some(palette.surface_hover)
+        } else {
+            None
+        };
+        if let Some(fill) = plate_fill {
+            if palette.vibrant() {
+                widgets::highlight_card(ui, palette, plate, fill);
+            } else {
+                ui.painter()
+                    .circle_filled(plate.center(), PLATE / 2.0, fill);
+            }
         }
         let tint = if lit || hovered {
             palette.text
