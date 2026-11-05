@@ -730,6 +730,11 @@ chat, `PgUp`/`PgDn` scroll by about a page, and `Home`/`End` (or `Ctrl+End`)
 jump to the top or the newest message when the input is empty. With text in
 the input, they move the text cursor as in any editor.
 
+Click the mouse wheel over the messages to scroll without turning it: a mark
+appears, and the further the pointer moves from it, the faster the chat goes.
+Any click or `Esc` stops it. Hold the wheel button instead and it stops when you
+let go.
+
 With a mouse that has them, the **Back** and **Forward** side buttons step
 through the places you have visited, as in a browser: between chats, and
 between the chat list, Settings, and the wallpaper picker. Forward repeats a

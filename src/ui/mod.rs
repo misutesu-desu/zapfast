@@ -2,6 +2,7 @@
 
 pub mod accounts;
 mod attachment_preview;
+pub mod autoscroll;
 mod blocking;
 pub mod call;
 pub mod calls;

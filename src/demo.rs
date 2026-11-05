@@ -18527,6 +18527,91 @@ mod tests {
     }
 
     #[test]
+    fn the_wheel_button_scrolls_the_open_chat() {
+        let mut app = app();
+        let ctx = egui::Context::default();
+        app.attach(&ctx);
+        let chat = sample_ids()[0].to_owned();
+        let when = crate::util::now();
+        let conversation = app.conversations.get_mut(&chat).expect("open chat");
+        for n in 0..60 {
+            conversation.messages.push(message(
+                &chat,
+                &format!("wheel-button-{n}"),
+                n % 2 == 0,
+                when - (60 - n),
+                Content::text(format!("Line {n}")),
+            ));
+        }
+        render(&mut app, &ctx);
+        assert!(app.at_bottom, "opens at the end");
+        let mark = egui::pos2(800.0, 400.0);
+        let moved = |y: f32| egui::Event::PointerMoved(egui::pos2(mark.x, y));
+        let button = |button, pressed| egui::Event::PointerButton {
+            pos: mark,
+            button,
+            pressed,
+            modifiers: egui::Modifiers::NONE,
+        };
+        let middle = egui::PointerButton::Middle;
+        let offset = |ctx: &egui::Context| {
+            ctx.data(|data| {
+                data.get_temp::<(f32, f32)>(crate::ui::conversation::scroll_metrics_id(&chat))
+                    .expect("list drawn")
+                    .0
+            })
+        };
+        let running = |app: &App| app.conversations[&chat].autoscroll.is_some();
+
+        // A click at the mark starts it, and resting there moves nothing.
+        frame_with(&mut app, &ctx, vec![moved(mark.y), button(middle, true)]);
+        frame_with(&mut app, &ctx, vec![button(middle, false)]);
+        assert!(running(&app), "a click keeps it running");
+        settle_key_scroll(&mut app, &ctx);
+        assert!(app.at_bottom, "no pull at the mark");
+
+        // Above the mark the list moves toward older messages, and goes on
+        // moving while the pointer rests there.
+        frame_with(&mut app, &ctx, vec![moved(mark.y - 150.0)]);
+        let first = offset(&ctx);
+        settle_key_scroll(&mut app, &ctx);
+        let later = offset(&ctx);
+        assert!(later < first, "{later} moves up from {first}");
+        assert!(!app.at_bottom, "it leaves the end");
+        assert!(!app.scroll_to_bottom, "it releases the pin");
+
+        // The click that ends it stops the list and reaches nothing under it.
+        let primary = egui::PointerButton::Primary;
+        frame_with(&mut app, &ctx, vec![button(primary, true)]);
+        frame_with(&mut app, &ctx, vec![button(primary, false)]);
+        assert!(!running(&app), "any click stops it");
+        assert!(app.actions.is_empty(), "the click went nowhere");
+        let stopped = offset(&ctx);
+        settle_key_scroll(&mut app, &ctx);
+        assert_eq!(offset(&ctx), stopped);
+
+        // Holding and dragging ends with the button.
+        frame_with(&mut app, &ctx, vec![moved(mark.y), button(middle, true)]);
+        frame_with(&mut app, &ctx, vec![moved(mark.y + 120.0)]);
+        settle_key_scroll(&mut app, &ctx);
+        assert!(offset(&ctx) > stopped, "dragged down, it moves down");
+        frame_with(&mut app, &ctx, vec![button(middle, false)]);
+        assert!(!running(&app), "letting go of a drag stops it");
+
+        // Escape stops it and leaves the chat open.
+        frame_with(&mut app, &ctx, vec![moved(mark.y), button(middle, true)]);
+        frame_with(&mut app, &ctx, vec![button(middle, false)]);
+        assert!(running(&app));
+        frame_with(
+            &mut app,
+            &ctx,
+            vec![key(egui::Key::Escape, egui::Modifiers::NONE)],
+        );
+        assert!(!running(&app), "Escape stops it");
+        assert_eq!(app.open_chat.as_deref(), Some(chat.as_str()));
+    }
+
+    #[test]
     fn page_keys_scroll_the_open_chat_and_jump_to_its_ends() {
         let mut app = app();
         let ctx = egui::Context::default();

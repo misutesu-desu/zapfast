@@ -20,6 +20,7 @@ use crate::model::{
 use crate::theme::{self, Icon, Palette};
 use crate::wallpaper;
 
+use super::autoscroll::{self, Autoscroll};
 use super::focus::{self, Stop, TabStop};
 use super::widgets;
 
@@ -3281,6 +3282,13 @@ fn messages(app: &mut App, ui: &mut egui::Ui, chat: &Chat, under: f32) {
     // turn over the message list, before it takes another step.
     let mut key_scroll = conversation.key_scroll.take();
     let list = ui.available_rect_before_wrap();
+    let autoscroll = next_autoscroll(
+        ui,
+        conversation.autoscroll.take(),
+        list,
+        view.reaction.is_some(),
+    );
+    let autoscroll_pointer = ui.input(|input| input.pointer.latest_pos());
     // The list itself: one Tab stop over the whole message view, created
     // before the rows so their nodes can hang from its node. It senses no
     // pointer input. Asked for by a shortcut, it takes focus here, while it
@@ -3334,9 +3342,18 @@ fn messages(app: &mut App, ui: &mut egui::Ui, chat: &Chat, under: f32) {
     } else {
         carried
     };
-    if view.anchor.is_some() || view.reaction.is_some() || wheel_over_list || carried != 0.0 {
+    if view.anchor.is_some()
+        || view.reaction.is_some()
+        || wheel_over_list
+        || carried != 0.0
+        || autoscroll.is_some()
+    {
         key_scroll = None;
     }
+    let autoscroll = autoscroll.filter(|_| !wheel_over_list);
+    let autoscroll_speed = autoscroll
+        .zip(autoscroll_pointer)
+        .map_or(0.0, |(scroll, pointer)| scroll.speed(pointer.y));
     let key_duration = ui.style().scroll_animation.duration.max;
     // A key scroll starts one frame back, so it moves on its first frame and
     // a held key's repeats, which restart it, never stall it.
@@ -4161,6 +4178,14 @@ fn messages(app: &mut App, ui: &mut egui::Ui, chat: &Chat, under: f32) {
             // steps compose with the row-height compensation below, and
             // `scroll_with_delta` releases stick-to-bottom like edge-scroll
             // above. An instant jump to the end this frame wins over it.
+            if autoscroll_speed != 0.0 && !pinned {
+                let dt = ui.input(|input| input.stable_dt.min(0.1));
+                ui.scroll_with_delta_animation(
+                    vec2(0.0, -autoscroll_speed * dt),
+                    egui::style::ScrollAnimation::none(),
+                );
+                ui.ctx().request_repaint();
+            }
             if pinned {
                 key_scroll = None;
             } else if let Some(kind) = pending_scroll
@@ -4233,19 +4258,20 @@ fn messages(app: &mut App, ui: &mut egui::Ui, chat: &Chat, under: f32) {
         pos2(output.inner_rect.right() - 16.0, output.inner_rect.top()),
         output.inner_rect.right_bottom(),
     );
-    let reader_scrolled = ui.input(|input| {
-        input.smooth_scroll_delta.y != 0.0
-            || input
-                .raw
-                .events
-                .iter()
-                .any(|event| matches!(event, egui::Event::MouseWheel { .. }))
-            || (input.pointer.primary_down()
-                && input
-                    .pointer
-                    .interact_pos()
-                    .is_some_and(|pos| bar.contains(pos)))
-    });
+    let reader_scrolled = autoscroll_speed != 0.0
+        || ui.input(|input| {
+            input.smooth_scroll_delta.y != 0.0
+                || input
+                    .raw
+                    .events
+                    .iter()
+                    .any(|event| matches!(event, egui::Event::MouseWheel { .. }))
+                || (input.pointer.primary_down()
+                    && input
+                        .pointer
+                        .interact_pos()
+                        .is_some_and(|pos| bar.contains(pos)))
+        });
     let complete = conversation.complete;
     let loading = conversation.loading_older;
     let fetching = conversation.fetching_phone;
@@ -4292,6 +4318,18 @@ fn messages(app: &mut App, ui: &mut egui::Ui, chat: &Chat, under: f32) {
         }
     }
     conversation.key_scroll = key_scroll;
+    // A list that all fits has nowhere to go, so no mark shows on it.
+    conversation.autoscroll =
+        autoscroll.filter(|_| output.content_size.y > output.inner_rect.height());
+    if let (Some(scroll), Some(pointer)) = (conversation.autoscroll, autoscroll_pointer) {
+        // Over the rows, so the click that ends it reaches none of them.
+        ui.interact(
+            list,
+            ui.id().with("autoscroll-shield"),
+            Sense::click_and_drag(),
+        );
+        scroll.paint(ui, &palette, pointer.y);
+    }
     app.conversations
         .insert(chat.id.clone(), std::mem::take(&mut conversation));
     app.at_bottom = at_bottom;
@@ -5224,6 +5262,46 @@ fn message_copy_row(
         marker,
         reactions,
         quote,
+    }
+}
+
+/// The wheel-button scroll after this frame's button presses: the button
+/// starts one over the list, and a press of any button ends one already
+/// running.
+fn next_autoscroll(
+    ui: &egui::Ui,
+    current: Option<Autoscroll>,
+    list: Rect,
+    held_still: bool,
+) -> Option<Autoscroll> {
+    use egui::PointerButton::{Middle, Primary, Secondary};
+    let (time, origin, pointer, middle_pressed, middle_released, other_pressed) =
+        ui.input(|input| {
+            (
+                input.time,
+                input.pointer.press_origin(),
+                input.pointer.latest_pos(),
+                input.pointer.button_pressed(Middle),
+                input.pointer.button_released(Middle),
+                input.pointer.button_pressed(Primary) || input.pointer.button_pressed(Secondary),
+            )
+        });
+    if held_still || other_pressed {
+        return None;
+    }
+    match current {
+        None => origin
+            .filter(|origin| middle_pressed && autoscroll::starts_here(ui, list, *origin))
+            .map(|origin| Autoscroll::new(origin, time)),
+        Some(scroll) if scroll.held() => {
+            if middle_released {
+                pointer.and_then(|pointer| scroll.released(pointer.y, time))
+            } else {
+                Some(scroll)
+            }
+        }
+        Some(_) if middle_pressed => None,
+        running => running,
     }
 }
 

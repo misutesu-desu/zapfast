@@ -248,6 +248,16 @@ pub fn handle(app: &mut App, ctx: &egui::Context) {
             }
         });
     }
+    // Escape only stops a wheel-button scroll, it does not also leave the chat.
+    if let Some(conversation) = app
+        .open_chat
+        .clone()
+        .and_then(|chat| app.conversations.get_mut(&chat))
+        && conversation.autoscroll.is_some()
+        && ctx.input_mut(|input| input.consume_key(Modifiers::NONE, Key::Escape))
+    {
+        conversation.autoscroll = None;
+    }
     let escape = (!menu_open || app.reaction_target.is_some())
         && ctx.input_mut(|input| input.consume_key(Modifiers::NONE, Key::Escape));
     if escape {
@@ -1126,6 +1136,10 @@ pub const SHORTCUTS: &[(&str, &str)] = &[
     ),
     ("G", "Go to the replied message (in the message list)"),
     ("PgUp / PgDn", "Scroll the open chat by a page"),
+    (
+        "Wheel button",
+        "Scroll the open chat, faster the further the pointer moves",
+    ),
     (
         "Home / End",
         "Top / bottom of the open chat (when the input is empty)",

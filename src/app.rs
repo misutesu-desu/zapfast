@@ -206,6 +206,8 @@ pub struct Conversation {
     pub(crate) rows: HashMap<String, RowHeight>,
     /// The keyboard page, Home, or End scroll under way in the message list.
     pub(crate) key_scroll: Option<KeyScroll>,
+    /// The wheel-button scroll under way in the message list.
+    pub(crate) autoscroll: Option<crate::ui::autoscroll::Autoscroll>,
 }
 
 /// A keyboard scroll the message list eases through, one instant step per
@@ -6271,6 +6273,7 @@ impl App {
             self.scroll_page = None;
             if let Some(conversation) = self.conversations.get_mut(&id) {
                 conversation.key_scroll = None;
+                conversation.autoscroll = None;
             }
         }
         self.emoji_start = None;
