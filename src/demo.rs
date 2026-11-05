@@ -22775,8 +22775,10 @@ mod tests {
                     .map(|shape| borders(shape, rect, accent))
                     .sum(),
                 egui::Shape::Rect(shape)
+                    // Shrunk because a reaction chip in the chat behind a
+                    // dialog can graze the ring by a fraction of a point.
                     if shape.stroke.color == accent
-                        && shape.rect.intersects(rect)
+                        && shape.rect.shrink(1.0).intersects(rect)
                         && shape.stroke.width > 0.0 =>
                 {
                     assert_eq!(shape.rect, rect, "no second inner or outer border");
