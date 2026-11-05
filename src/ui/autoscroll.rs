@@ -10,7 +10,10 @@ use crate::theme::{self, Icon, Palette};
 /// Around the mark the pointer rests without scrolling.
 const DEAD_ZONE: f32 = 12.0;
 /// Points per second for each point past the dead zone.
-const PACE: f32 = 15.0;
+const PACE: f32 = 6.0;
+/// Adds speed with the square of that distance, so a small move stays easy to
+/// read by and a long one covers the chat.
+const ACCELERATION: f32 = 0.12;
 const MAX_SPEED: f32 = 12000.0;
 /// A press shorter than this, without a scroll, is a click.
 const CLICK_SECONDS: f64 = 0.3;
@@ -39,7 +42,12 @@ impl Autoscroll {
     pub fn speed(&self, pointer_y: f32) -> f32 {
         let distance = pointer_y - self.anchor.y;
         let past = (distance.abs() - DEAD_ZONE).max(0.0);
-        (past * PACE).min(MAX_SPEED).copysign(distance)
+        if past == 0.0 {
+            return 0.0;
+        }
+        (past * PACE + past * past * ACCELERATION)
+            .min(MAX_SPEED)
+            .copysign(distance)
     }
 
     /// The scroll after the button came up, `None` if that ended it.
@@ -112,6 +120,8 @@ mod tests {
         assert!(scroll.speed(260.0) > scroll.speed(230.0));
         assert!(scroll.speed(230.0) > 0.0);
         assert_eq!(scroll.speed(140.0), -scroll.speed(260.0));
+        let gain = |from: f32, to: f32| scroll.speed(200.0 + to) - scroll.speed(200.0 + from);
+        assert!(gain(150.0, 200.0) > gain(50.0, 100.0), "it accelerates");
         assert_eq!(scroll.speed(100_000.0), MAX_SPEED);
     }
 
