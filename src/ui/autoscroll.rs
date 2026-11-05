@@ -10,8 +10,8 @@ use crate::theme::{self, Icon, Palette};
 /// Around the mark the pointer rests without scrolling.
 const DEAD_ZONE: f32 = 12.0;
 /// Points per second for each point past the dead zone.
-const PACE: f32 = 5.0;
-const MAX_SPEED: f32 = 4000.0;
+const PACE: f32 = 15.0;
+const MAX_SPEED: f32 = 12000.0;
 /// A press shorter than this, without a scroll, is a click.
 const CLICK_SECONDS: f64 = 0.3;
 const MARK_RADIUS: f32 = 16.0;
