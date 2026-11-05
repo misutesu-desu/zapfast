@@ -107,7 +107,7 @@ pub fn doodle_ink(background: Color32) -> Color32 {
     let (ink, step) = if luma - f32::from(DARK_INK) > f32::from(LIGHT_INK) - luma {
         (DARK_INK, 23.2)
     } else {
-        (LIGHT_INK, 24.0)
+        (LIGHT_INK, 38.0)
     };
     let distance = (luma - f32::from(ink)).abs().max(1.0);
     let alpha = (step / distance).clamp(0.1, 0.4);

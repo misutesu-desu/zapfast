@@ -14698,7 +14698,11 @@ mod tests {
         fn controls(shapes: &[egui::epaint::ClippedShape]) -> Vec<egui::Rect> {
             fn collect(shape: &egui::Shape, out: &mut Vec<egui::Rect>) {
                 match shape {
-                    egui::Shape::Circle(circle) if (circle.radius - 20.0).abs() < 1.1 => {
+                    // The rail's lit plate and New chat, behind the modal, are
+                    // as big but stand left of the stage.
+                    egui::Shape::Circle(circle)
+                        if (circle.radius - 20.0).abs() < 1.1 && circle.center.x > 480.0 =>
+                    {
                         out.push(egui::Rect::from_center_size(
                             circle.center,
                             egui::Vec2::splat(40.0),
@@ -21714,10 +21718,13 @@ mod tests {
         let text = ctx.read_response(input).unwrap();
         assert!(field.rect.contains_rect(text.rect));
         assert!(field.rect.width() > text.rect.width());
+        assert_eq!(ring(&ctx), None, "the caret alone marks a clicked field");
+        ctx.data_mut(|data| data.insert_temp(crate::theme::keyboard_focus_id(), true));
+        frame_sized(&mut app, &ctx, 780.0, Vec::new());
         assert_eq!(
             ring(&ctx),
             Some(field.rect),
-            "input focus outlines the composer's rounded field"
+            "keyboard focus outlines the composer's rounded field"
         );
         assert_eq!(
             ctx.data(
@@ -22047,7 +22054,7 @@ mod tests {
                     })
                     .expect("the field publishes its text's place");
                 if text.is_empty() {
-                    let (_, _, hint) = painted_ink(&shapes, "Search")
+                    let (_, _, hint) = painted_ink(&shapes, "Search or start a new chat")
                         .into_iter()
                         .find(|(_, _, rect)| pill.contains(rect.center()))
                         .expect("the hint is painted in the field");
@@ -23630,6 +23637,7 @@ mod tests {
     #[test]
     fn the_chat_list_shrinks_back_from_its_widest() {
         let mut app = app();
+        app.settings.sidebar_width = 300.0;
         let ctx = egui::Context::default();
         app.attach(&ctx);
         render(&mut app, &ctx);
@@ -25736,8 +25744,8 @@ mod rail_tests {
             assert!(top[0].bottom() <= top[1].top());
             // Starred heads the bottom group, a plate and a gap above
             // Archived, or Settings when nothing is archived or locked.
-            let below = if Destination::Archived.offered(&app) {
-                destination_rect(&ctx, Destination::Archived)
+            let below = if Destination::Locked.offered(&app) {
+                destination_rect(&ctx, Destination::Locked)
             } else {
                 settings
             };
@@ -25880,7 +25888,6 @@ mod rail_tests {
                         Stop::Chats,
                         Stop::Calls,
                         Stop::Starred,
-                        Stop::Archived,
                         Stop::Locked,
                         Stop::Settings,
                         Stop::Profile,
@@ -25957,7 +25964,7 @@ mod rail_tests {
                 let (mut app, ctx) = open(page, macos);
                 let chats = destination_rect(&ctx, Destination::Chats);
                 let profile = stop_rect(&ctx, Stop::Profile).unwrap();
-                let size = egui::vec2(1180.0, 300.0);
+                let size = egui::vec2(1180.0, 240.0);
                 for _ in 0..3 {
                     frame_at(&mut app, &ctx, size, Vec::new());
                 }
@@ -26011,7 +26018,7 @@ mod rail_tests {
         let (all, missed) = (chip(&ctx, CallFilter::All), chip(&ctx, CallFilter::Missed));
         let search = stop_rect(&ctx, Stop::Search).expect("the search field");
         assert!(all.top() >= search.bottom() && all.right() <= missed.left());
-        assert_eq!(all.height(), 28.0, "the chat list's chip");
+        assert_eq!(all.height(), 32.0, "the chat list's chip");
         assert_eq!(stop_rect(&ctx, Stop::All), Some(all));
         assert_eq!(stop_rect(&ctx, Stop::Missed), Some(missed));
         let rows: Vec<(Message, bool)> = calls::rows(&app.call_log)
@@ -26110,19 +26117,18 @@ mod rail_tests {
         assert!(recorded(&ctx, calls::filter_chip_id(CallFilter::Missed)).is_some());
     }
 
-    /// Archived sits in the rail's bottom group, lit while the archive fills
-    /// the list column, and Chats leads back; the chip row has no Archived.
+    /// Archived is a row at the head of the list, and the archive fills the
+    /// list column; Chats leads back. The chip row has no Archived.
     #[test]
-    fn the_archive_opens_from_the_rail_into_the_list() {
+    fn the_archive_opens_from_a_row_in_the_list() {
         let (mut app, ctx) = open("chat", false);
         assert!(
             Destination::Archived.offered(&app),
             "the demo archives chats"
         );
-        let archived = destination_rect(&ctx, Destination::Archived);
-        let settings = destination_rect(&ctx, Destination::Settings);
+        let archived = stop_rect(&ctx, Stop::Archived).expect("the Archived row");
         let rail = rail_rect(&ctx).unwrap();
-        assert!(rail.contains_rect(archived) && archived.bottom() <= settings.top());
+        assert!(archived.left() >= rail.right(), "beside the rail");
         assert!(
             ctx.data(|data| data.get_temp::<egui::Rect>(egui::Id::new("archived-chip")))
                 .is_none(),

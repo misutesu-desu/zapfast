@@ -14,10 +14,13 @@ use super::widgets;
 pub fn show(app: &mut App, ui: &mut egui::Ui) {
     search_keyboard(app, ui);
     let palette = app.palette;
+    // A small window keeps room for the conversation; the width asked for
+    // comes back when the window grows.
+    let widest = (ui.ctx().content_rect().width() * MAX_LIST_SHARE).clamp(260.0, 520.0);
     let panel = egui::Panel::left("chats")
         .resizable(true)
-        .default_size(app.settings.sidebar_width)
-        .size_range(260.0..=520.0)
+        .default_size(app.settings.sidebar_width.min(widest))
+        .size_range(260.0..=widest)
         .show_separator_line(false)
         .frame(
             Frame::new()
@@ -29,7 +32,7 @@ pub fn show(app: &mut App, ui: &mut egui::Ui) {
         body(app, ui);
     });
     let width = response.response.rect.width();
-    if (width - app.settings.sidebar_width).abs() > 1.0 {
+    if (width - app.settings.sidebar_width).abs() > 1.0 && width < widest - 1.0 {
         app.settings.sidebar_width = width;
         app.actions.push(Action::SettingsChanged);
     }
@@ -343,6 +346,9 @@ enum HeaderButton {
     NewCall,
     Menu,
 }
+
+/// The most of the window the chat list may take.
+const MAX_LIST_SHARE: f32 = 0.34;
 
 /// Height of the Archived row at the head of the list.
 const ARCHIVED_ROW: f32 = 52.0;

@@ -183,17 +183,14 @@ pub fn show(app: &mut App, ui: &mut egui::Ui, hidden: bool) {
         } else {
             ui.add_space(GAP);
         }
-        // Archived is a row at the head of the chat list instead, except with
-        // the list hidden, where the rail is the only way to it.
+        // Archived is a row at the head of the chat list instead.
         let bottom: Vec<Destination> = [
             Destination::Starred,
-            Destination::Archived,
             Destination::Locked,
             Destination::Settings,
         ]
         .into_iter()
         .filter(|destination| destination.offered(app))
-        .filter(|destination| hidden || *destination != Destination::Archived)
         .collect();
         let foot = bottom.len() as f32 * (PLATE + GAP) + GAP + AVATAR + GAP;
         let minimum = 2.0 * CELL

@@ -88,9 +88,10 @@ protocol. These notes are for coding agents and new contributors.
   A navigation rail (`src/ui/rail.rs`) runs down the left of the chat list
   on every platform, 64 points wide and a shade off the list:
   Chats and Calls at the top, the one on screen lit (Calls and Starred
-  are left through Chats or Escape, never toggled); Starred, Archived and
-  Locked (while there are such chats; they open in the list column),
-  Settings and our own avatar at the bottom. While the list is hidden the
+  are left through Chats or Escape, never toggled); Starred, Locked (while
+  there are such chats; it opens in the list column), Settings and our own
+  avatar at the bottom. Archived chats open from a row at the head of the list
+  (`chats::archived_entry`). While the list is hidden the
   chats' avatars fill it between the two (`chats::compact_list`); beside the
   list they would only repeat it. On macOS the traffic lights reach
   past it over the header beside it, which leaves `rail::lights_overhang`
