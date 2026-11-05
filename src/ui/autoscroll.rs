@@ -3,7 +3,7 @@
 //! speed. A quick click leaves it running until the next click; holding the
 //! button stops on release.
 
-use egui::{Color32, Pos2, Stroke, pos2, vec2};
+use egui::{Color32, Pos2, Stroke, vec2};
 
 use crate::theme::{self, Icon, Palette};
 
@@ -97,6 +97,7 @@ pub fn starts_here(ui: &egui::Ui, list: egui::Rect, pos: Pos2) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use egui::pos2;
 
     fn at(y: f32) -> Autoscroll {
         Autoscroll::new(pos2(100.0, y), 10.0)
