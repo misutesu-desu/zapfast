@@ -25747,13 +25747,13 @@ mod rail_tests {
                 starred.top() > top[1].bottom() + 100.0,
                 "{macos}: at the foot"
             );
-            assert_eq!(starred.size(), egui::vec2(36.0, 36.0));
+            assert_eq!(starred.size(), egui::vec2(40.0, 40.0));
             assert!(
                 (me.top() - settings.bottom() - 8.0).abs() < 0.5
                     && (rail.bottom() - me.bottom() - 8.0).abs() < 0.5,
                 "{macos}: Settings, our avatar and the edge 8 points apart: {settings:?} {me:?}"
             );
-            assert_eq!(settings.size(), egui::vec2(36.0, 36.0));
+            assert_eq!(settings.size(), egui::vec2(40.0, 40.0));
             assert_eq!(me.size(), egui::vec2(32.0, 32.0));
             // A Mac lays out its own way whichever the preview says.
             if crate::theme::macos_chrome(&ctx) {
@@ -26138,20 +26138,17 @@ mod rail_tests {
         assert!(!app.show_archived && Destination::Chats.lit(&app));
     }
 
-    /// The rail is one shade darker than the list in every palette, light,
-    /// dark and the Messages theme's.
+    /// The rail stands a shade off the list in the default palettes: lighter
+    /// in the dark one, darker in the light one, as on WhatsApp Web.
     #[test]
-    fn the_rail_is_a_shade_darker_than_the_list() {
+    fn the_rail_is_a_shade_off_the_list() {
         let luma = |color: egui::Color32| {
             u32::from(color.r()) + u32::from(color.g()) + u32::from(color.b())
         };
-        for palette in [
-            crate::theme::Palette::light(),
-            crate::theme::Palette::dark(),
-        ] {
-            assert!(luma(palette.rail()) < luma(palette.sidebar()));
-            assert!(palette.rail().a() >= palette.sidebar().a());
-        }
+        let light = crate::theme::Palette::light();
+        assert!(luma(light.rail()) < luma(light.sidebar()));
+        let dark = crate::theme::Palette::dark();
+        assert!(luma(dark.rail()) > luma(dark.sidebar()));
     }
 
     /// The list header keeps only New chat and Hide the chat list beside its
