@@ -18599,6 +18599,10 @@ mod tests {
         frame_with(&mut app, &ctx, vec![moved(mark.y + 120.0)]);
         settle_key_scroll(&mut app, &ctx);
         assert!(offset(&ctx) > stopped, "dragged down, it moves down");
+        assert!(
+            app.selection.is_none() && app.sweep.is_none(),
+            "dragging with the wheel button selects nothing"
+        );
         frame_with(&mut app, &ctx, vec![button(middle, false)]);
         assert!(!running(&app), "letting go of a drag stops it");
 

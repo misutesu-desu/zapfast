@@ -3856,7 +3856,7 @@ fn messages(app: &mut App, ui: &mut egui::Ui, chat: &Chat, under: f32) {
                                             );
                                         });
                                     }
-                                    if pick.drag_started() {
+                                    if pick.drag_started_by(egui::PointerButton::Primary) {
                                         actions.push(Action::SweepMessages {
                                             anchor: message.id.clone(),
                                             to: message.id.clone(),
@@ -4934,7 +4934,7 @@ fn bubble(
         if strip.clicked() {
             actions.push(Action::FocusComposer);
         }
-        if strip.drag_started() {
+        if strip.drag_started_by(egui::PointerButton::Primary) {
             actions.push(Action::SweepMessages {
                 anchor: message.id.clone(),
                 to: message.id.clone(),
