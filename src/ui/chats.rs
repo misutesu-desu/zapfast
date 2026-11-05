@@ -1566,9 +1566,9 @@ fn row(app: &mut App, ui: &mut egui::Ui, chat: &Chat) -> egui::Response {
         );
         let name_width = (right - stamp_galley.size().x - 8.0 - left).max(0.0);
         let name_font = if unread {
-            theme::semibold(14.5)
+            theme::medium(15.0)
         } else {
-            theme::medium(14.5)
+            theme::regular(15.0)
         };
         let name = widgets::line(ui, &title, name_font, palette.text, name_width, 1);
         name.paint(ui, pos2(left, name_top), palette.text);
