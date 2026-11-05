@@ -1257,16 +1257,6 @@ pub fn highlight_card(ui: &Ui, palette: &Palette, card: Rect, color: Color32) {
             .rect_filled(card, radius, palette.tint(strength));
         return;
     }
-    // Raised like a message bubble, only more gently: the list sits on a
-    // flat panel, and a hovered row should not jump out.
-    let mut shadow = palette.bubble_shadow();
-    shadow.color = shadow.color.gamma_multiply(0.6);
-    ui.painter().add(shadow.as_shape(card, radius));
-    ui.painter().rect_filled(
-        card.translate(vec2(0.0, -theme::RAISED_EDGE)),
-        radius,
-        palette.raised_edge(color),
-    );
     ui.painter().rect_filled(card, radius, color);
 }
 
