@@ -465,14 +465,17 @@ impl Palette {
         }
     }
 
-    /// Avatar background derived from the chat hue.
+    /// Avatar background derived from the chat hue: a deep tint on a dark
+    /// theme, a pale one on a light theme, under initials in the same hue.
     pub fn avatar(&self, hue: f32) -> Color32 {
-        let (saturation, lightness) = if self.dark {
-            (0.38, 0.42)
-        } else {
-            (0.45, 0.62)
-        };
+        let (saturation, lightness) = if self.dark { (0.38, 0.2) } else { (0.45, 0.88) };
         hsl(hue, saturation, lightness)
+    }
+
+    /// The initials or icon on an [`avatar`](Self::avatar) of the same hue.
+    pub fn avatar_ink(&self, hue: f32) -> Color32 {
+        let lightness = if self.dark { 0.68 } else { 0.32 };
+        hsl(hue, 0.65, lightness)
     }
 }
 
