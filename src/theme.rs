@@ -267,11 +267,18 @@ impl Palette {
         }
     }
 
-    /// The navigation rail's background: the chat list's, one shade darker,
-    /// so the two read as separate columns without a line between them. A
-    /// translucent sidebar darkens the same way, with a little more of it
-    /// opaque.
+    /// The navigation rail's background, which sets it apart from the chat
+    /// list without a line between them. As on WhatsApp Web it is a step
+    /// toward the raised surfaces. A translucent sidebar darkens instead, with
+    /// a little more of it opaque.
     pub fn rail(&self) -> Color32 {
+        if !self.vibrant() {
+            return if self.dark {
+                blend(self.panel, self.surface, 0.5)
+            } else {
+                self.surface
+            };
+        }
         let sidebar = self.sidebar();
         let shade = if self.dark {
             DARK_RAIL_SHADE

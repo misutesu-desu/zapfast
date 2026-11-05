@@ -16,14 +16,14 @@ use super::focus::{Stop, TabStop};
 use super::widgets;
 
 /// Width of the rail, on every platform.
-pub const WIDTH: f32 = 52.0;
+pub const WIDTH: f32 = 64.0;
 /// Height of one destination at the top: the list header's title and
 /// search field sit level with Chats and Calls.
 const CELL: f32 = 48.0;
 /// The lit square behind a destination's icon.
-const PLATE: f32 = 36.0;
+const PLATE: f32 = 40.0;
 /// A destination's icon.
-const ICON: f32 = 20.0;
+const ICON: f32 = 22.0;
 /// Our avatar at the foot of the rail.
 const AVATAR: f32 = 32.0;
 /// Space above the first destination, as the list header's own margin, and
