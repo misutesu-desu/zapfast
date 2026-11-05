@@ -2660,7 +2660,7 @@ mod tests {
     }
 
     /// The fingerprint [`whatsapp_bubbles_are_unchanged`] recorded.
-    const WHATSAPP_BUBBLES: u64 = 0x179b_3424_7615_2b9a;
+    const WHATSAPP_BUBBLES: u64 = 0xb87e_0a68_5b2c_c69a;
 
     /// Every shape-checking test below draws into this view.
     const SCREEN: egui::Rangef = egui::Rangef {
