@@ -2478,7 +2478,7 @@ mod tests {
     /// list beside a chat. Calls, Starred and Settings are in the rail.
     #[test]
     fn header_buttons_follow_the_width() {
-        use HeaderButton::{HideList, NewChat};
+        use HeaderButton::{Menu, NewChat};
         let buttons = |width: f32| {
             let ctx = egui::Context::default();
             let mut buttons = Vec::new();
@@ -2495,7 +2495,7 @@ mod tests {
             output.textures_delta.clear();
             buttons
         };
-        assert_eq!(buttons(1000.0), [NewChat, HideList]);
+        assert_eq!(buttons(1000.0), [NewChat, Menu]);
         assert_eq!(buttons(400.0), [NewChat]);
     }
 

@@ -828,6 +828,42 @@ fn header(app: &mut App, ui: &mut egui::Ui, chat: &Chat) -> Rect {
                                 app.actions.push(Action::CloseChat);
                             }
                         });
+                    let searching = app.chat_search_open;
+                    if !folded {
+                        let tip = format!(
+                            "{} ({})",
+                            crate::i18n::gettext(app.locale, "Search messages"),
+                            super::keys::label("Ctrl+F")
+                        );
+                        if palette.vibrant() {
+                            ui.add_space(BUTTON_GAP);
+                        }
+                        let search_glass = ui.painter().add(egui::Shape::Noop);
+                        let search = theme::icon_button(
+                            ui,
+                            Icon::Search,
+                            18.0,
+                            if searching {
+                                palette.accent
+                            } else {
+                                palette.secondary
+                            },
+                            palette.text,
+                            &tip,
+                        )
+                        .tab_stop(Stop::ChatSearch);
+                        if palette.vibrant() {
+                            ui.painter()
+                                .set(search_glass, glass_button(&palette, search.rect));
+                        }
+                        if search.clicked() {
+                            app.actions.push(if searching {
+                                Action::CloseChatSearch
+                            } else {
+                                Action::OpenChatSearch
+                            });
+                        }
+                    }
                     // A person's chat calls them and a group's starts a call
                     // in the group; a channel, a broadcast list and the chat
                     // with ourselves have no call button. While this chat has
@@ -890,42 +926,6 @@ fn header(app: &mut App, ui: &mut egui::Ui, chat: &Chat) -> Rect {
                             if video.clicked() {
                                 app.actions.push(Action::StartVideoCall(chat.id.clone()));
                             }
-                        }
-                    }
-                    let searching = app.chat_search_open;
-                    if !folded {
-                        let tip = format!(
-                            "{} ({})",
-                            crate::i18n::gettext(app.locale, "Search messages"),
-                            super::keys::label("Ctrl+F")
-                        );
-                        if palette.vibrant() {
-                            ui.add_space(BUTTON_GAP);
-                        }
-                        let search_glass = ui.painter().add(egui::Shape::Noop);
-                        let search = theme::icon_button(
-                            ui,
-                            Icon::Search,
-                            18.0,
-                            if searching {
-                                palette.accent
-                            } else {
-                                palette.secondary
-                            },
-                            palette.text,
-                            &tip,
-                        )
-                        .tab_stop(Stop::ChatSearch);
-                        if palette.vibrant() {
-                            ui.painter()
-                                .set(search_glass, glass_button(&palette, search.rect));
-                        }
-                        if search.clicked() {
-                            app.actions.push(if searching {
-                                Action::CloseChatSearch
-                            } else {
-                                Action::OpenChatSearch
-                            });
                         }
                     }
                     // A narrow window shows the list or the chat, not both;
@@ -1737,7 +1737,7 @@ fn composer(app: &mut App, ui: &mut egui::Ui, chat: &Chat, review_send: Option<b
                     ui.add_space(COMPOSER_PAIR_GAP - ui.spacing().item_spacing.x);
                     let smile = last_line(ui, line, |ui| theme::icon_button(
                         ui,
-                        Icon::Sticker,
+                        Icon::Smile,
                         22.0,
                         if app.picker.is_some() {
                             palette.accent
