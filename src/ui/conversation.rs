@@ -1721,7 +1721,7 @@ fn composer(app: &mut App, ui: &mut egui::Ui, chat: &Chat, review_send: Option<b
                 if app.editing.is_none() {
                     let tools = last_line(ui, line, |ui| theme::icon_button(
                         ui,
-                        Icon::Plus,
+                        Icon::Paperclip,
                         22.0,
                         if app.composer_tools_open {
                             palette.accent
@@ -1737,7 +1737,7 @@ fn composer(app: &mut App, ui: &mut egui::Ui, chat: &Chat, review_send: Option<b
                     ui.add_space(COMPOSER_PAIR_GAP - ui.spacing().item_spacing.x);
                     let smile = last_line(ui, line, |ui| theme::icon_button(
                         ui,
-                        Icon::Smile,
+                        Icon::Sticker,
                         22.0,
                         if app.picker.is_some() {
                             palette.accent
@@ -2174,7 +2174,7 @@ const COMPOSER_RADIUS: u8 = 24;
 const COMPOSER_PADDING: f32 = 14.0;
 /// Height of the plus and emoji buttons: a row is never shorter, or they
 /// would stretch it and pull the text off its centre.
-const COMPOSER_CONTROL: f32 = 36.0;
+const COMPOSER_CONTROL: f32 = 46.0;
 /// Space between the composer's rounded field and the buttons at its ends.
 const COMPOSER_INSET: i8 = 2;
 /// Space between the plus and emoji buttons' hit areas. Each area pads its

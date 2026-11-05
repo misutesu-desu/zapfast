@@ -492,6 +492,10 @@ fn focus_ring(app: &App, ctx: &egui::Context) {
     if !keyboard && !ctx.text_edit_focused() {
         return;
     }
+    // WhatsApp Web marks its message field with the caret alone.
+    if !keyboard && response.id == conversation::composer_id() {
+        return;
+    }
     let rect = custom.map_or(response.rect, |outline| outline.rect);
     if !rect.is_positive() {
         return;
