@@ -402,6 +402,9 @@ msgstr "Ad veya numara ara"
 msgid "Search"
 msgstr "Ara"
 
+msgid "Search or start a new chat"
+msgstr "Aratın veya yeni sohbet başlatın"
+
 #: src/ui/chats.rs:695
 msgid "No starred messages"
 msgstr "Yıldızlı mesaj yok"
@@ -4067,3 +4070,9 @@ msgstr "gönderilmedi"
 
 #~ msgid "Channel"
 #~ msgstr "Kanal"
+
+msgid "Wheel button"
+msgstr "Tekerlek düğmesi"
+
+msgid "Scroll the open chat, faster the further the pointer moves"
+msgstr "Açık sohbeti kaydırır, imleç uzaklaştıkça hızlanır"

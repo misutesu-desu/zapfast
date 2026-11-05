@@ -136,8 +136,8 @@ fn header(app: &mut App, ui: &mut egui::Ui) {
     // the rows' timestamps do.
     Frame::new()
         .inner_margin(Margin {
-            left: 14,
-            right: 14,
+            left: 20,
+            right: 20,
             top: 8,
             bottom: 8,
         })
@@ -150,9 +150,9 @@ fn header(app: &mut App, ui: &mut egui::Ui) {
             super::caption_drag(
                 ui,
                 Rect::from_min_size(
-                    top.min - vec2(14.0, 8.0),
+                    top.min - vec2(20.0, 8.0),
                     vec2(
-                        top.width() + 28.0,
+                        top.width() + 40.0,
                         8.0 + room.top + super::conversation::HEADER_ROW,
                     ),
                 ),
@@ -321,7 +321,7 @@ fn search_and_filters(app: &mut App, ui: &mut egui::Ui) {
         &palette,
         egui::Id::new("chat-search"),
         &mut text,
-        crate::i18n::gettext(app.locale, "Search").as_ref(),
+        crate::i18n::gettext(app.locale, "Search or start a new chat").as_ref(),
         width,
     )
     .tab_stop(Stop::Search);
@@ -624,7 +624,7 @@ fn filter_chips(app: &mut App, ui: &mut egui::Ui) {
     ui.add_space(8.0);
     let output = widgets::chip_scroll_row(ui, "chat-filters", |ui| {
         ui.horizontal(|ui| {
-            ui.spacing_mut().item_spacing = vec2(4.0, 6.0);
+            ui.spacing_mut().item_spacing = vec2(8.0, 6.0);
             for filter in ChatFilter::EVERY {
                 let count = match filter {
                     ChatFilter::All => 0,

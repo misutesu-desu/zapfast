@@ -1012,7 +1012,7 @@ pub fn search_field(
     hint: &str,
     width: f32,
 ) -> egui::Response {
-    let height = 34.0;
+    let height = 40.0;
     let (rect, _) = ui.allocate_exact_size(vec2(width, height), Sense::hover());
     let has_focus = ui.memory(|memory| memory.has_focus(id));
     // Over a vibrant window's material, a tint that lets it show through.
@@ -1962,20 +1962,22 @@ pub fn dotted_chip(
     count: usize,
     selected: bool,
 ) -> egui::Response {
-    let color = if selected {
+    let color = if selected && !palette.vibrant() {
+        theme::blend(palette.accent, palette.text, 0.6)
+    } else if selected {
         palette.accent
     } else {
         palette.secondary
     };
     let painter = ui.painter();
-    let text = painter.layout_no_wrap(label.to_owned(), theme::medium(12.5), color);
+    let text = painter.layout_no_wrap(label.to_owned(), theme::medium(14.0), color);
     let number =
-        (count > 0).then(|| painter.layout_no_wrap(count.to_string(), theme::regular(11.5), color));
+        (count > 0).then(|| painter.layout_no_wrap(count.to_string(), theme::regular(12.5), color));
     let gap = 5.0;
     let dot_width = if dot.is_some() { 8.0 + gap } else { 0.0 };
     let width =
         dot_width + text.size().x + number.as_ref().map_or(0.0, |number| gap + number.size().x);
-    let (rect, response) = ui.allocate_exact_size(vec2(width + 18.0, 28.0), Sense::click());
+    let (rect, response) = ui.allocate_exact_size(vec2(width + 26.0, 32.0), Sense::click());
     theme::reveal_focus(&response);
     theme::focus_outline(ui, response.id, rect, rect.height() / 2.0);
     if ui.is_rect_visible(rect) {
@@ -1983,6 +1985,14 @@ pub fn dotted_chip(
         if selected {
             ui.painter()
                 .rect_filled(rect, radius, palette.accent.gamma_multiply(0.18));
+            if !palette.vibrant() {
+                ui.painter().rect_stroke(
+                    rect,
+                    radius,
+                    Stroke::new(1.0, palette.accent.gamma_multiply(0.45)),
+                    egui::StrokeKind::Inside,
+                );
+            }
         } else {
             let (hover, edge) = if palette.vibrant() {
                 (

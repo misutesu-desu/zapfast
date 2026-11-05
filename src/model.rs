@@ -191,9 +191,9 @@ impl ChatFilter {
     pub const EVERY: [Self; 6] = [
         Self::All,
         Self::Unread,
-        Self::Private,
         Self::Favorites,
         Self::Groups,
+        Self::Private,
         Self::Channels,
     ];
 
