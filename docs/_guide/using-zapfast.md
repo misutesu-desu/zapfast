@@ -171,7 +171,7 @@ by sender, time, and a short summary.
 time. Stars made on your phone or another linked device show up here too, and
 the other way round. Stars made before your copy of ZapFast followed them are
 read from the phone once, the next time it connects. The star near the foot of the rail on the left of the chat list, above
-**Archived** and **Settings**, opens
+**Settings**, opens
 **Starred**, which lists every starred message, newest star first, with its
 chat's name and when it was starred. Text shows as written; a photo, video,
 document, or voice message shows the same label the chat list uses. Clicking a
@@ -784,9 +784,9 @@ if it is unavailable, try again or block the person on your phone.
 
 The chips under the search bar narrow the list to **Unread**, **Private**
 (one-to-one chats), **Favorites** (in your phone's order), or **Groups**.
-Followed channels have their own **Channels** chip. **Archived**, in the rail
-on the left above **Settings**, opens the archived chats in the list, and
-shows how many of them are unread. A chip with unread chats shows how many it
+Followed channels have their own **Channels** chip. **Archived**, a row at the
+head of the list, opens the archived chats there, and shows how many of them
+are unread. A chip with unread chats shows how many it
 has. Click the active chip again, or **All**, to see every chat. The
 filter applies only to this list: search and the archive still show everything.
 ZapFast remembers the chip or label each account last showed and comes back
@@ -953,9 +953,9 @@ A thin rail runs down the left of the chat list: **Chats** and **Calls**
 (`Ctrl+Shift+1` and `Ctrl+Shift+2`, Command on macOS) at the top;
 **Starred**, **Archived** and **Locked** (while you have archived or locked
 chats), **Settings**, and your own picture (the account switcher) at the
-bottom. The one on screen is lit. The chat list's header keeps its title, **New
-chat**, and the button beside it (`Ctrl+B`), which hides the list: the chats'
-avatars then fill the rail between its top and bottom buttons. Unread chats
+bottom. The one on screen is lit. The chat list's header keeps its title, the green
+**New chat** button, and a menu with **Settings** and **Hide the chat list**
+(`Ctrl+B`): the chats' avatars then fill the rail between its top and bottom buttons. Unread chats
 show their badge, hovering names a chat, clicking opens it, and `Ctrl+B` or
 the button under **Calls** brings the full list back.
 In a short window, scroll the rail to reach its lower buttons. Tab and

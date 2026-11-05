@@ -14699,9 +14699,9 @@ mod tests {
             fn collect(shape: &egui::Shape, out: &mut Vec<egui::Rect>) {
                 match shape {
                     // The rail's lit plate and New chat, behind the modal, are
-                    // as big but stand left of the stage.
+                    // as big but stand in the top bar, above the arrows.
                     egui::Shape::Circle(circle)
-                        if (circle.radius - 20.0).abs() < 1.1 && circle.center.x > 480.0 =>
+                        if (circle.radius - 20.0).abs() < 1.1 && circle.center.y > 80.0 =>
                     {
                         out.push(egui::Rect::from_center_size(
                             circle.center,
@@ -22991,7 +22991,6 @@ mod tests {
                         Stop::Chats,
                         Stop::Calls,
                         Stop::Starred,
-                        Stop::Archived,
                         Stop::Locked,
                         Stop::Settings,
                         Stop::Profile,
